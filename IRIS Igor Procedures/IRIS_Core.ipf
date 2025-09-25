@@ -174,18 +174,6 @@ Function IRIS()
 	string/G sResultsPath
 	string/G sDataPathOnDisk
 	string/G sDataPathOnDisk_Original
-
-	String platform = UpperStr(IgorInfo(2))
-	Variable platform_pos = strsearch(platform,"WINDOWS",0)
-	string homeDir
-	string relativePath
-	if (platform_pos >= 0)
-		homeDir = GetEnvironmentVariable("USERPROFILE")
-		relativePath = "C:IRIS"
-	else
-		homeDir = GetEnvironmentVariable("USER") // GetEnvironmentVariable("HOME")
-	endif
-
 	if(developmentMode == 1)
 		// Path for .iris configuration file
 		sIRISpath = 	"Macintosh HD:Users:Rick:Professional:Aerodyne:Software Development:IRIS"
@@ -194,19 +182,12 @@ Function IRIS()
 		// Path for .str and .stc data files
 		sDataPathOnDisk = "Macintosh HD:Users:Rick:Professional:Aerodyne:Software Development:IRIS"
 	else
-		if (platform_pos >= 0)
-			// Path for .iris configuration file
-			sIRISpath = "C:IRIS"
-			// Path for saving results files
-			sResultsPath = sIRISpath
-			// Path for .str and .stc data files
-			sDataPathOnDisk = "C:TDLWintel:Data"
-		else
-			relativePath = "Library:CloudStorage:OneDrive-UniversityofCambridge:godwinlab_data:Aerodyne:Data"
-			sIRISpath = "Mac:Users" + ":" + homeDir + ":" + relativePath + ":" + "IRIS"
-			sResultsPath = sIRISpath
-			sDataPathOnDisk = "Mac:Users" + ":" + homeDir + ":" + relativePath
-		endif
+		// Path for .iris configuration file
+		sIRISpath = "C:IRIS"
+		// Path for saving results files
+		sResultsPath = sIRISpath
+		// Path for .str and .stc data files
+		sDataPathOnDisk = "C:TDLWintel:Data"
 	endif
 	sDataPathOnDisk_Original = sDataPathOnDisk // only needed in case the user chooses files outside this directory in the reanalysis tab 
 	NewPath/C/Q/O pIRISpath, sIRISpath // the "/C" flag creates the folder on disk if it does not already exist
@@ -1186,6 +1167,10 @@ Function IRIS_UTILITY_Reanalyze()
 	wave wSecondPlotColor = root:wSecondPlotColor
 	
 	variable i
+	
+	// Clear the status log...
+	Notebook StatusNotebook, selection={startOfFile, endOfFile}
+	Notebook StatusNotebook, text = "STATUS LOG"
 	
 	// Re-create matrix of time series of output variables, for the graph
 	variable numAliquots = str2num(IRIS_UTILITY_GetParamValueFromName("Number of Aliquots per Sample"))
@@ -2465,7 +2450,11 @@ Function IRIS_UTILITY_SaveResults()
 	string header
 	
 	string/G sTextResults = ""
+	string/G sCSVResults_L1 = ""
+	string/G sCSVResults_L1L2 = ""
 	string sTextResultsTemp
+	string sCSVResultsTemp_L1
+	string sCSVResultsTemp_L1L2
 	string sDataFilterThreshold = IRIS_UTILITY_GetParamValueFromName("Data Filter Threshold")
 		
 	NVAR numSampleGases = root:numSampleGases
@@ -2514,25 +2503,34 @@ Function IRIS_UTILITY_SaveResults()
 	string/G sBundleFileNameRoot = "IRIS Bundled Results - " + sRunID + " -" + sDataFileString
 	string sStatusFileNameRoot = "IRIS Status Log - " + sRunID + " -" + sDataFileString
 	string/G sResultsFileTXT = sResultsFileNameRoot + ".txt" // name of the file to create
+	string/G sResultsFileSummaryCSV_L1 = sResultsFileNameRoot + "_L1.csv" // name of the file to create
+	string/G sResultsFileSummaryCSV_L1L2 = sResultsFileNameRoot + "_L1_L2.csv" // name of the file to create
 	string/G sGraphsFilePNG = sGraphsFileNameRoot + ".png" // name of the file to create
 	string/G sBundleFilePDF = sBundleFileNameRoot + ".pdf" // name of the file to create
 	string/G sStatusFileTXT = sStatusFileNameRoot + ".txt" // name of the file to create
 	string sExistingFilesTXT = IndexedFile(pResultsSubfolderPath, -1, ".txt")
+	string sExistingFilesCSV = IndexedFile(pResultsSubfolderPath, -1, ".csv")
 	string sExistingFilesPNG = IndexedFile(pResultsSubfolderPath, -1, ".png")
 	string sExistingFilesPDF = IndexedFile(pResultsSubfolderPath, -1, ".pdf")
 	string sMatchStrTXT = "*" + sResultsFileTXT + "*"
+	string sMatchStrCSV_L1 = "*" + sResultsFileSummaryCSV_L1 + "*"// Berkeley-specific file
+	string sMatchStrCSV_L1L2 = "*" + sResultsFileSummaryCSV_L1L2 + "*"// Berkeley-specific file
 	string sMatchStrPNG = "*" + sGraphsFilePNG + "*"
 	string sMatchStrPDF = "*" + sBundleFilePDF + "*"
 	string sMatchStrStatusTXT = "*" + sStatusFileTXT + "*"
 	variable checkTXT = stringmatch(sExistingFilesTXT, sMatchStrTXT)
+	variable checkCSV_L1 = stringmatch(sExistingFilesCSV, sMatchStrCSV_L1)
+	variable checkCSV_L1L2 = stringmatch(sExistingFilesCSV, sMatchStrCSV_L1L2)
 	variable checkPNG = stringmatch(sExistingFilesPNG, sMatchStrPNG)
 	variable checkPDF = stringmatch(sExistingFilesPDF, sMatchStrPDF)
 	variable checkStatusTXT = stringmatch(sExistingFilesTXT, sMatchStrStatusTXT)
 	variable adjustmentIndex = 0
-	if((checkTXT == 1) || (checkPNG == 1) || (checkPDF == 1) || (checkStatusTXT == 1))
+	if((checkTXT == 1) || (checkPNG == 1) || (checkPDF == 1) || (checkStatusTXT == 1) || (checkCSV_L1 == 1) || (checkCSV_L1L2 == 1))
 		do
 			adjustmentIndex += 1
 			sResultsFileTXT = sResultsFileNameRoot + " - rev" + num2istr(adjustmentIndex) + ".txt"
+			sResultsFileSummaryCSV_L1 = sResultsFileNameRoot + "_summary_L1 - rev" + num2istr(adjustmentIndex) + ".csv" // Berkeley-specific file
+			sResultsFileSummaryCSV_L1L2 = sResultsFileNameRoot + "_summary_L1_L2 - rev" + num2istr(adjustmentIndex) + ".csv" // Berkeley-specific file
 			sGraphsFilePNG = sGraphsFileNameRoot + " - rev" + num2istr(adjustmentIndex) + ".png"
 			sGraphsFileNameBaseNoExt = sGraphsFileNameRoot + " - rev" + num2istr(adjustmentIndex) // needed for appending "- Variable0" etc in IRIS_UTILITY_MakeAndSaveGraphs
 			sBundleFilePDF = sBundleFileNameRoot + " - rev" + num2istr(adjustmentIndex) + ".pdf"
@@ -2541,14 +2539,69 @@ Function IRIS_UTILITY_SaveResults()
 			sExistingFilesPNG = IndexedFile(pResultsSubfolderPath, -1, ".png")
 			sExistingFilesPDF = IndexedFile(pResultsSubfolderPath, -1, ".pdf")
 			sMatchStrTXT = "*" + sResultsFileTXT + "*"
+			sMatchStrCSV_L1 = "*" + sResultsFileSummaryCSV_L1 + "*"  // Berkeley-specific file
+			sMatchStrCSV_L1L2 = "*" + sResultsFileSummaryCSV_L1L2 + "*"  // Berkeley-specific file
 			sMatchStrPNG = "*" + sGraphsFilePNG + "*"
 			sMatchStrPDF = "*" + sBundleFilePDF + "*"
 			sMatchStrStatusTXT = "*" + sStatusFileTXT + "*"
 			checkTXT = stringmatch(sExistingFilesTXT, sMatchStrTXT)
+			checkCSV_L1 = stringmatch(sExistingFilesTXT, sMatchStrCSV_L1)
+			checkCSV_L1L2 = stringmatch(sExistingFilesTXT, sMatchStrCSV_L1L2)
 			checkPNG = stringmatch(sExistingFilesPNG, sMatchStrPNG)
 			checkPDF = stringmatch(sExistingFilesPDF, sMatchStrPDF)
 			checkStatusTXT = stringmatch(sExistingFilesTXT, sMatchStrStatusTXT)
-		while((checkTXT == 1) || (checkPNG == 1) || (checkPDF == 1) || (checkStatusTXT == 1))
+		while((checkTXT == 1) || (checkPNG == 1) || (checkPDF == 1) || (checkStatusTXT == 1) || (checkCSV_L1 == 1) || (checkCSV_L1L2 == 1))
+	endif
+	
+	// Record Berkeley-specific data output
+	SVAR sInstrumentType = root:sInstrumentType
+	
+	if(stringmatch("D17O_d13C_CO2_LBL", sInstrumentType))
+		header = "Sample ID,Start time,CO2 MR,CO2 MR SE,Cell Pressure,Cell Pressure SE,Cell Temp,Cell Temp SE,d13C,d13C SE,d17O,d17O SE,d18O,d18O SE,D'17O,D'17O SE"
+		Open/A/P=pResultsSubfolderPath f1 as sResultsFileSummaryCSV_L1 // if file already exists, we will append the new info to it (in case future code allows for reanalysis of data)
+		fprintf f1, "%s\r\n", header
+		sprintf sCSVResultsTemp_L1, "%s\r\n", header
+	
+		for(k=0;k<numGases;k+=1)
+			if(k<numSampleGases && numtype(wOutputMeans[k][0])==0)
+				fprintf f1, "%s,", wtParamValues[k]
+				fprintf f1, "%s %s,", secs2date(wOutputTime[k][0],0), secs2time(wOutputTime[k][0],2)
+				fprintf f1, "%g,%g,", wOutputMeans[k][8], wOutputStErrs[k][8]
+				fprintf f1, "%g,%g,", wOutputMeans[k][10], wOutputStErrs[k][10]
+				fprintf f1, "%g,%g,", wOutputMeans[k][11], wOutputStErrs[k][11]
+				fprintf f1, "%g,%g,", wOutputMeans[k][2], wOutputStErrs[k][2]		
+				fprintf f1, "%g,%g,", wOutputMeans[k][4], wOutputStErrs[k][4]
+				fprintf f1, "%g,%g,", wOutputMeans[k][6], wOutputStErrs[k][6]
+				fprintf f1, "%g,%g,", wOutputMeans[k][0], wOutputStErrs[k][0]
+				fprintf f1, "\n"
+			endif	
+		endfor
+		
+		sCSVResults_L1 += sCSVResultsTemp_L1
+		Close f1
+	
+		header = "Sample ID,Start time,CO2 MR,CO2 MR SE,Cell Pressure,Cell Pressure SE,Cell Temp,Cell Temp SE,d13C,d13C SE,d17O,d17O SE,d18O,d18O SE,D'17O,D'17O SE"
+		Open/A/P=pResultsSubfolderPath f1 as sResultsFileSummaryCSV_L1L2 // if file already exists, we will append the new info to it (in case future code allows for reanalysis of data)
+		fprintf f1, "%s\r\n", header
+		sprintf sCSVResultsTemp_L1L2, "%s\r\n", header
+	
+		for(k=0;k<numGases;k+=1)
+			if(k<numSampleGases && numtype(wOutputMeans[k][0])==0)
+				fprintf f1, "%s,", wtParamValues[k]
+				fprintf f1, "%s %s,", secs2date(wOutputTime[k][0],0), secs2time(wOutputTime[k][0],2)
+				fprintf f1, "%g,%g,", wOutputMeans[k][8], wOutputStErrs[k][8]
+				fprintf f1, "%g,%g,", wOutputMeans[k][10], wOutputStErrs[k][10]
+				fprintf f1, "%g,%g,", wOutputMeans[k][11], wOutputStErrs[k][11]
+				fprintf f1, "%g,%g,", wOutputMeans[k][3], wOutputStErrs[k][3]		
+				fprintf f1, "%g,%g,", wOutputMeans[k][5], wOutputStErrs[k][5]
+				fprintf f1, "%g,%g,", wOutputMeans[k][7], wOutputStErrs[k][7]
+				fprintf f1, "%g,%g,", wOutputMeans[k][1], wOutputStErrs[k][1]		
+				fprintf f1, "\n"
+			endif	
+		endfor
+	
+		sCSVResults_L1L2 += sCSVResultsTemp_L1L2
+		Close f1
 	endif
 	
 	// Record basic information about this run
@@ -7642,7 +7695,7 @@ Function IRIS_GUI_Panel()
 	
 	// Add the Aerodyne logo...
 	NewPanel/HOST=IRISpanel/N=LogoSubwindowPanel_tabRunOrReanalyze/W=(0,panelHeight - logoHeight,panelWidth,panelHeight)
-	ModifyPanel frameStyle = 0, frameInset = 0, noEdit = 1, fixedSize = 1
+	ModifyPanel/W=IRISpanel#LogoSubwindowPanel_tabRunOrReanalyze frameStyle = 0, frameInset = 0, noEdit = 1, fixedSize = 1
 	Button IRIS_AerodyneLogo_tabRunOrReanalyze, win = IRISpanel#LogoSubwindowPanel_tabRunOrReanalyze, align = 0, pos = {panelWidth/2 - logoWidth/2, 0}, size = {logoWidth,logoHeight}, noproc, title = " ", picture = ProcGlobal#AerodyneLogoButtonPic
 	SetActiveSubwindow ##
 	
