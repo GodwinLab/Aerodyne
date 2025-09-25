@@ -1,0 +1,45 @@
+//	LoadSPB re-injection  walkthrough
+// needs LoadSPE and LoadSPB ipfs
+// this is a beta testing command line set
+//
+//
+SetDataFolder root:;
+//String/G toppath = "Ceres:TDLWintel:Data";
+//SPB_TopSideFileList( toppath, 1 );		// 	this loads everything one layer deep
+											//	(see below for alternate)
+String/G toppath = "Ceres:TDLWintel:Data:161119";
+SPB_TopSideFileList( toppath, 0 );			// 	this loads everything in folder only
+
+SPB_DiveDirectory4SPB( toppath, 1, 1 );
+SPB_ParseAndDocumentFileList( );			// this generates a roadmap 
+											// of file type and spe-companions
+SPB_ChronoTestLoad();
+
+// Pluck the spectrum from the right sub folder and set these
+
+String/G orig_spb = "Ceres:TDLWintel:Data:161119:161119_121444_001_SIG.spb"
+String/G orig_spe = "Ceres:TDLWintel:Data:161119:161119_121444_001_SIG.spe"
+String/G newFolderStr = "Ceres:Out"
+
+// STOP
+// do manipulations
+// in this example the data spectrum is at root:new_data
+//
+
+SPB_WriteNewSPB( orig_spb, orig_spe, root:new_data, newFolderStr )
+
+
+//
+//
+//
+// SPB_GraftNewDataOntoInputBinary( input_w, new_data_w )
+//	Wave input_w
+//	Wave new_data_w
+// 		input_w is the loaded binary file parsed with each element 
+//		in the wave as the double precision data value using little endian byte ordering
+//
+//		new_data_w is the same product geometry of the
+//		resulting parse wave -> SPB_Data_Spectrum_Matrix
+
+
+

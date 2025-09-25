@@ -1,0 +1,173 @@
+// ECL Igor Scripts
+// This poor readme has three sections of definitions and example calls
+// 1. Parse and Cut = lifts out the ECL_Index start and stop times
+// 2. Apply = uses the made start/stops to produce averages of whatever with tuning tweaks
+// 3. Math = do things with the made averages that may be on different time bases
+// 4. Graphs = Who wants to go hunting for the right wave names?!?
+// 5. Export = push the data into a .csv file for excel or other software tool.
+
+///////////////////////////////////
+/////// Parse and Cut
+//////////////////////////////////
+ECL_ParseAndCutIndex( 1 );ECL_ParseAndCutIndex( 2 );
+// This function will go through the stc_ECL_Index, find all occurrences of "1", then "2" 
+// and produce a start, stop, mid and delta time
+// the default location for these results is root:ECL_WorkFolder_A
+
+SetDataFolder root:ECL_WorkFolder_A	// is a handy command, if you pop out to the root directory, you need to jump back to your working directory.
+
+// You can override the destination datafolder, the source of the stc_time and ecl_index
+// waves by reading the optional arguments section in the LoadSPE2.ipf
+// As an Example you could invoke these create
+// the output in
+//	  ECL_ParseAndCutIndex( 1, subfolderSuffix="Flask1" );
+// then explicitly set the working folder using a global string with the following
+// NOTE: if you use the global override, you must include the prefix, 'ECL_WorkFolder_'
+//	  root:gs_ECL_WorkFolder = "ECL_WorkFolder_Flask1";
+// thereafter, commands do not need to specify the workfolder; they can but not needed.
+//	  ECL_ApplyIndex2List( 1, root:str_source_rtime, "n2o;",  Algorithm="TimeShift:10,0" )
+// Other options for _ParseAndCutIndex:
+// 
+//	Option				Default		Note
+//	tidyup					1		->  ECL_ParseAndCutIndex( 1, tidyup=0 )	// leaves an unequal number of Start and Stops untouched
+//	FirstLineIsStart		0		->  ECL_ParseAndCutIndex( 1, FirstLineIsStart=1 )	// will let the first stop use the start of the time wave as the companion 'start time'
+//	LastLineIsStop			0		->  ECL_ParseAndCutIndex( 1, LastLineIsStop=1 )		// will let an unterminated 'stop' use the final entry of the time wave as the companion 'stop time'
+//	SummaryTable			1		->  ECL_ParseAndCutIndex( 1, SummaryTable=0 )		// suppress the creation of the summary table
+//  subFolderSuffix		   "A"		-> 	ECL_ParseAndCutIndex( 1, subfolderSuffix="Flask1" );
+//  stc_time_w		  root:stc_time 		  
+//  stc_index_w		  root:stc_ECL_Index 	->  ECL_ParseAndCutIndex( 1, stc_time=root:someFolder:some_time, stc_index_w=root:someFolder:some_indexWave );
+
+// Naturally you can call options together by adding a comma
+// ECL_ParseAndCutIndex( 1, FirstLineIsStart = 1, SummaryTable = 0 )
+
+//////////////////////////////////////////////////////////
+////////////// Apply Family
+/////////////////////////////////////////////////////////
+SetDataFolder root:ECL_WorkFolder_A;	
+ECL_ApplyIndex2XY( 1, root:str_source_rtime, root:n2o, "N2O" )
+// This is the core function.  All subsequent functions actually call this one by lining up
+// the various waves
+
+// An example of a manually generated list is shown below
+// the optional argument "Algorithm" is also introduced
+ECL_ApplyIndex2List( 1, root:str_source_rtime, "n2o;co;h2o",  Algorithm="OrderedInterval:0.0,0.35" )
+ECL_ApplyIndex2List( 1, root:str_source_rtime, "n2o;co;h2o",  Algorithm="TimeShift:150,0" )
+
+
+// The tandem below will use the last str load information, presuming you used the panel
+// and create average and standard deviation for all loaded species
+//  Note: this is done for all waves in the str_ time family of waves
+ECL_ApplyIndex2DefaultStr( 1 ); ECL_ApplyIndex2DefaultStr( 2 );
+
+
+SetDataFolder root:ECL_WorkFolder_A;	
+ECL_ApplyIndex2DefaultStc( 1 ); ECL_ApplyIndex2DefaultStc( 2 );
+
+// The tandem above will use the last stc load information, presuming you used the panel
+// and create average and standard deviation for all loaded diagnostics
+//  Note: this is done for all waves in the stc_ time family of waves except
+// 	{	stc_time, stc_ECL_Index, stc_SPEFile, stc_StatusW, stc_USBByte, 
+//		stc_V_Laser_2, stc_V_Laser_1, stc_VICI_W, stc_VICI_2_W, 
+//		stc_Zero_F_2, stc_Zero_F_1, stc_Range_F_2_L_2, stc_Range_F_2_L_1, 
+//		stc_LW_Laser_2, stc_LW_Laser_1, stc_ConvergenceWord, stc_X2, stc_X1 
+//	}	... to add any of them back in, manually edit LoadSPE2.ipf||ECL_ApplyIndex2DefaultStc
+
+
+//////////////////////////////////////////////////////////
+////////////// Math Family
+/////////////////////////////////////////////////////////
+//ECL_MathOp( arg1, arg1index, arg2, arg2index, operation, scalar, modifier )
+// operations = {add,sum,minus,subtract,difference,ratio,divide,multiply,product,do-del}
+
+ECL_MathOp( "Praw", 1, "Praw", 2, "divide", 1.0, "" )
+ECL_MathOp( "i636", 1, "i626", 1, "divide", 1.0, "" )
+ECL_MathOp( "i636", 2, "i626", 2, "divide", 1.0, "" )
+
+// A feature of MathOp is that it will put the fully specified wave name of the result
+// onto the clipboard.  You can run back to your workflow text file, paste it
+// where needed
+
+//root:ECL_WorkFolder_A:ECL_Ratio_i6361_o_i6261
+Duplicate/O root:ECL_WorkFolder_A:ECL_Ratio_i6361_o_i6261, root:superRatio
+root:superRatio = root:ECL_WorkFolder_A:ECL_Ratio_i6361_o_i6261 / root:ECL_WorkFolder_A:ECL_Ratio_i6362_o_i6262 
+ECL_MathOp( "i636", 1, "i626", 1, "do-del", 1.0, "" )
+
+//////////////////////////////////////////////////////////
+////////////// Graph Family
+/////////////////////////////////////////////////////////
+// If you don't have a top graph, you'll need to execute
+Display
+// to get started since the ECL_AppendToGraph normally works on the top window
+
+** ECL_AppendToGraph( arg, index, [AddErrorBar subfolderSuffix, options] )
+//example
+ECL_AppendToGraph( "i626", 1 )
+// Your hard won efforts for the i626 averaged species will be added to the graph
+
+// This only works once.  Subsequent appending of the same data wave won't really be able 
+// to pick the stylings, you'll need to use the menu.
+//	This is due to the SameWaveName#1, SameWaveName#2 as 'traces'
+
+
+// OPTIONS
+
+// if you want to suppress the error bars next time you can do
+ECL_AppendToGraph( "i626", 1, AddErrorBar=0 )
+
+// if you are really advanced, and working in a different folder than root:ECL_WorkFolder_A
+// ECL_AppendToGraph( "i626", 1, AddErrorBar=0, subFolderSuffix="J" )
+
+// if you want to have more control of the graph at creation, or you are getting sick of 
+// modifying the defaults
+ECL_AppendToGraph( "i626", 1, options = "AXIS:Left;COLOR:Blue;MARK:16" )
+// AXIS will be the name of an existing or new "left" axis, formally /L=<this parameter>
+// There is no way to make a right axis with this tool.
+
+// COLOR needs to be one of the following (and shame on me, it is case sensitive)
+//	Red, Pink, Salmon, Wine, Orange, Yellow, Mustard, PhosGreen, Green, DarkGreen
+//	Cyan, Aqua, Blue, Midnight, SkyBlue, StormBlue, Purple, Violet
+//	Black, DarkGray/Grey, Gray/Grey, LightGray/Grey, White
+
+// MARK is the marker Number
+
+
+//////////////////////////////////////////////////////////
+////////////// Export Results Family
+/////////////////////////////////////////////////////////
+// If you don't have a top graph, you'll need to execute
+// ECL_Export( index )
+// This function will take waves from the current datafolder [ SetDataFolder:root:ECL_WorkFolder_A // or other suffix ]
+// The function discards waves that are probably unimportant
+// The options are:
+//											DEFAULTS
+//		DiskPath, 						<dialog box, pick a folder>
+//		FileName, 						ECLXport_YYYYMMDD_HHMMSS.cvs
+//		FileFormat, 						csv
+//		subFolderSuffix, 				"A" or root:gs_ECL_WorkFolder
+//		AddToExport, 					<none**>
+//		TimeFormat, 						"american"
+//		FileLineTerminator				"\r\n" // CRLF
+//
+//	Examples:
+//		ECL_Export( 1, DiskPath = "Macintosh HD:Users:scott:Dropbox:_MyMisc:ECLFolder" )
+
+		// named tioem format types are:
+		// american:		"MM/DD/YYYY HH:mm:SS"
+		// european:		"MM/DD/YYYY HH:mm:SS"
+		// sortable:			"YYYY/MM/DD HH:mm:SS"
+		// filename:		"YYYYMMDD_HHmmSS"
+		// filename2y:		"YYMMDD_HHmmSS"
+		// dash-american:	"MM-DD-YYYY HH:mm:SS"
+		// dash-european:	"DD-MM-YYYY HH:mm:SS"
+		// dash-sortable:	"YYYY-MM-DD HH:mm:SS"
+// ** AddToExport is a textwave that contains waves the default algorithm isn't finding.
+//	Example, you invoke Duplicate/O ECL_1_N2O_Avg, ImportantResult
+// ImportantResult = function of other inputs, but it doesn't follow ECL_<index> naming convention
+// Force it into the Export like this ...
+// Make/N=0/T/O myExports
+// AppendString( myExports, "ImportantResults" )
+// AppendString( myExports, "ECL_1_N2O_TrueTime" ) // which was 'discarded' 
+// then
+// ECL_Export( 1, AddToExport = myExports );
+//
+		

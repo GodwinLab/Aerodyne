@@ -1,0 +1,11 @@
+// THIS SCRIPT FILLS THE INTERMEDIATE VOLUME WITH SAMPLE
+				
+dno14			// open valve P14 (switcher vac)
+dno12			// open valve P12 (intermediate volume)
+bc20			// pump 20 seconds on intermediate volume
+dnc12			// close valve P12 (intermediate volume)
+dnc14			// close valve P14 (switcher vac)
+azb1,1,150		// fill via valve E1 (sample orifice) until gauge 2 (intermediate volume) reaches 150 torr
+bc60       		// special use of bc: 60 sec timeout for the azb command on the previous line
+dmWaiting_for_ref_measurement_to_complete // status message in popup window
+cr				// wait for the timer that started before this script began

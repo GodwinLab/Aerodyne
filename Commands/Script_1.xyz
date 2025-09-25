@@ -1,0 +1,147 @@
+// RUN THIS SCRIPT ONCE THE FIRST CO2 SAMPLE IS READY TO BE ACCEPTED THROUGH VALVE P18
+// THIS SCRIPT EVACUATES THE WHOLE SAMPLING SYSTEM, FILLS THE UPPER FLASK, WAITS FOR MIXING, AND THEN FLUSHES THE FLASK LINES
+				
+				// THIS BLOCK TELLS TDL WINTEL THAT DATA WILL BE GARBAGE FOR NOW
+ca0				// disable user ECL index (set stc_ECL_index = 0)
+bdfits1			// suspend fitting
+amwd0			// turn off wd
+bc1				// wait 1 sec
+amwd1			// turn on wd
+
+				// THIS BLOCK DEACTIVATES ALL VALVES
+//bq0			// close all valves and deactivate the 3-way valve, which sets it to the lower flask
+dnc1			// close E1
+dnc2			// close E2
+dnc3			// close E3
+dnc4			// close E4
+dnc5			// close E5
+dnc9			// close P9
+dnc10			// close P10
+dnc11			// close P11
+dnc12			// close P12
+dnc13			// close P13
+dnc14			// close P14
+dnc15			// close P15
+dnc17			// close P17
+dnc18			// close P18
+dnc19			// set 3-way valve to lower flask
+
+dmEvacuating_switcher_and_mixer // status message in popup window
+
+				// THIS BLOCK EVACUATES THE WHOLE SAMPLING SYSTEM FROM BOTH ENDS (BUT NOT THE CELL)
+dnc15			// close valve P15 (cell), redundancy just in case
+dno17			// open valve P17 (mixer vac)
+bc5				// wait 5 sec
+dno14			// open valve P14 (switcher vac)
+bc5				// wait 5 sec
+dno12			// open valve P12 (intermediate volume)
+bc5				// wait 5 sec
+dno9			// open valve P9 (working ref cross vac)
+bc5				// wait 5 sec
+dno3			// open valve E3 (upper flask input)
+bc5				// wait 5 sec
+dno4			// open valve E4 (lower flask input)
+bc5				// wait 5 sec
+bc30			// wait 30 sec for first half of thorough evacuation
+dno19			// set 3-way valve to upper flask in case any little pocket of gas is exposed when switching
+bc30			// wait 30 sec for second half of thorough evacuation
+
+				// THIS BLOCK DEACTIVATES ALL VALVES
+//bq0			// close all valves and deactivate the 3-way valve, which sets it to the lower flask
+dnc1			// close E1
+dnc2			// close E2
+dnc3			// close E3
+dnc4			// close E4
+dnc5			// close E5
+dnc9			// close P9
+dnc10			// close P10
+dnc11			// close P11
+dnc12			// close P12
+dnc13			// close P13
+dnc14			// close P14
+dnc15			// close P15
+dnc17			// close P17
+dnc18			// close P18
+dnc19			// set 3-way valve to lower flask
+
+				// THIS BLOCK OPENS THE REF GAS SUPPLY PORT
+dno11			// open valve P11 (ref gas port)
+				
+				// THIS BLOCK RECORDS THE ZERO OFFSET FOR BOTH MIXER P SENSORS
+cz1,11,12		// capture into R11, the P(zero) of AD12 (the low-P sensor in mixer)
+cz1,12,13		// capture into R12, the P(zero) oF AD13 (the high-P sensor in mixer)
+
+dmAdding_CO2_to_the_first_flask // status message in popup window
+
+				// THIS BLOCK ADDS CO2 TO THE UPPER FLASK, FROM A SMALL VOLUME (e.g. A VIAL) UPSTREAM OF P18
+dno18			// let CO2 sample flow into manifold
+bc4				// for 4 sec (exact time not important as CO2 will rapidly equilibrate across the valve)
+dnc18			// and then close valve P18
+bc4         	// let it settle for readings
+cz1,13,12   	// capture into R13, the P(CO2) of AD12 (the low-P sensor in mixer)
+cysub,14,13,11	// store P(CO2) - P(zero) in register 14 (R14) to account for offset in gauge
+cz0,15,125		// *** store '125' into R15     %%% the 125 factor controls the final [CO2] in the lower flask (it is the inverse of the product of the volume ratio and the target mixing ratio)
+cymul,16,14,15	// store R14 * R15 into R16
+cyadd,17,16,12	// store R16 (target pressure) + R12 (high-P sensor zero offset) into R17 to get target high-P sensor reading
+dno3        	// open valve E3 (upper flask input) to let CO2 expand into upper flask
+bc20        	// molecular diffusion 10*1/e time ...
+dnc3        	// close valve E3 (upper flask input) to isolate upper flask from manifold
+
+dmAdding_dilution_gas_to_the_first_flask // status message in popup window
+
+				// THIS BLOCK ADDS DILUTION GAS TO THE UPPER FLASK, TO REACH THE TARGET CO2 MIXING RATIO
+dno17       	// open valve P17 (mixer vac) to manifold
+bc5         	// dispose of unrecoverable CO2
+dnc17       	// close valve P17 (mixer vac)
+dno5        	// open valve E5 (dilution gas)
+bc4				// load up a little pressure in the prep volume
+dnc5        	// close valve E5 (dilution gas)
+dno3        	// open valve E3 (upper flask input) to let dilution gas slam & mix into flask
+azb3,5,-17		// control E5 to fill to the R17 target P(tot) reading
+bc180       	// special use of bc: 180 sec timeout for the aza command on the previous line
+
+				// THIS BLOCK CLOSES ALL THE MIXER MANIFOLD VALVES
+dnc3			// close valve E3 (upper flask input)
+dnc4			// close valve E4 (lower flask input)
+dnc5			// close valve E5 (dilution gas supply)
+dnc18			// close valve P18 (CO2 supply)
+dnc17			// close valve P17 (mixer vac)
+
+dmWaiting_32_minutes_for_mixing_in_the_first_flask // status message in popup window
+
+				// THIS BLOCK WAITS 32 MINUTES FOR MIXING OF THE FIRST FLASK FILL
+bc1920			// wait 1920 sec
+
+
+dmFlushing_the_flask_output_tube // status message in popup window
+
+				// THIS BLOCK FORWARD-FLUSHES THE JOINT SAMPLE LINE WITH GAS FROM THE UPPER FLASK AND LEAVES THE UPPER FLASK EXPOSED TO IT
+dno14			// pre apply vacuum 
+dno12			// all the way through
+dno1			// to measurement orifice
+bc2				// wait 2 sec with flow
+dno19			// set 3-way valve to upper flask
+bc20			// downstream (i.e. forward) flush for 20 sec
+dnc1			// close valve E1 (sample orifice)
+dnc12			// close valve P12 (intermediate volume)
+dnc14			// close valve P14 (switcher vac)
+
+dmFlushing_the_flask_input_tube // status message in popup window
+
+				// THIS BLOCK BACK-FLUSHES THE INPUT TUBE OF THE FLASK THAT WE FILLED AT THE BEGINNING OF THIS SCRIPT
+dno17			// open valve P17 (mixer vac) to evacuate mixer manifold
+bc5				// wait 5 sec
+dnc17			// close valve P17 (mixer vac)
+dno3			// open valve E3 (upper flask input) to let a finite portion of the flask gas flow back into the empty manifold
+bc1	        	// wait shortest possible time
+dnc3			// close valve E3 (upper flask input) to isolate flask from manifold
+
+				// THIS BLOCK INITIALIZES REGISTER VALUES FOR DYNAMIC VALVE CONTROL
+cz0,1,1			// store '1' into Register 1 (R1); a constant
+cz0,4,4			// store '4' into Register 4 (R4); a constant
+cz0,10,0		// store '0' into Register 10 (R10), which must contain either a 1 (ECL commands access upper flask) or 0 (ECL commands access lower flask)
+cysub,34,4,10	// update Register 34 (R34), which stores the valve number for flask input, either 3 or 4 (counting from 1), computed from R10
+
+dmPlease_prepare_your_CO2_sample_upstream_of_valve_P18_now_and_then_launch_the_next_script // put up message window to prompt the user
+
+				// THE SYSTEM IS NOW READY FOR FILLING OF THE LOWER FLASK AND MEASURING FROM THE UPPER FLASK (once the user manually prepares the CO2 supply upstream of valve P18)

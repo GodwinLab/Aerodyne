@@ -1,0 +1,21 @@
+// RUN THIS SCRIPT WHEN YOU NEED TO EVACUATE THE VOLUME UPSTREAM OF VALVE P18, e.g. BEFORE OPENING THE MANUAL VALVE ON A NEWLY CONNECTED SAMPLE VIAL
+// THIS SCRIPT EVACUATES THE VOLUME UPSTREAM OF P18 (CO2 supply), e.g. THE VOLUME BETWEEN P18 AND THE VALVE OF A SAMPLE VIAL
+
+dmStarting_evacuation_of_CO2_port // status message in popup window
+
+			// THIS BLOCK CLOSES ALL THE MIXER MANIFOLD VALVES
+dnc3		// close valve E3 (upper flask input)
+dnc4		// close valve E4 (lower flask input)
+dnc5		// close valve E5 (dilution gas supply)
+dnc18		// close valve P18 (CO2 supply)
+dnc17		// close valve P17 (mixer vac)
+
+			// THIS BLOCK EVACUATES THE VOLUME UPSTREAM OF P18 (CO2 supply)
+dno17		// open valve P17 (mixer vac)
+bc5			// wait 5 sec
+dno18		// open valve P18 (CO2 supply)
+bc5			// wait 5 sec
+dnc18		// close valve P18 (CO2 supply)
+dnc17		// close valve P17 (mixer vac)
+
+dmFinished_evacuation_of_CO2_port // status message in popup window

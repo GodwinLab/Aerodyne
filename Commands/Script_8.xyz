@@ -1,0 +1,18 @@
+// THIS SCRIPT TRANSFERS SAMPLE GAS FROM THE INTERMEDIATE VOLUME TO THE CELL
+
+ca0				// suspend ecl index
+bdFits1			// suspend fitting
+dnc12			// shut intermediate volume
+dno14			// open vac valve
+dno15			// open cell valve	
+bc25			// wait 25 seconds to pump
+dnc14			// shut vac valve
+bc1				// wait 1 seconds
+dno12			// open intermediate volume, expand gas into cell
+bc4				// wait 4 seconds to expand gas into cell
+dnc15			// shut cell, measurement runs
+dnc12			// close intermediate volume
+bz1				// defines ecl index = 1 (sample)
+ca1				// executes ecl index
+bdFits0			// restarts fitting
+cr60			// start a 60-second timer

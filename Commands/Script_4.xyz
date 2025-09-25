@@ -1,0 +1,18 @@
+// THIS SCRIPT DOES ONE SWITCHER CYCLE
+// (i.e. PUT REF IN INTERMEDIATE VOLUME, TRANSFER THAT TO THE CELL, PUT SAMPLE IN INTERMEDIATE VOLUME, AND TRANSFER THAT TO THE CELL)
+
+dmFilling_intermediate_volume_with_ref // status message in popup window
+
+dd5				// fill the intermediate volume with ref gas
+
+dmTransferring_ref_into_cell // status message in popup window
+
+dd6				// transfer the ref gas from the intermediate volume to the cell
+
+dmFilling_intermediate_volume_with_sample_from_the_mixed_flask // status message in popup window
+
+dd7				// fill the intermediate volume with sample gas
+
+dmTransferring_sample_into_cell // status message in popup window
+
+dd8				// transfer the sample gas from the intermediate volume to the cell
