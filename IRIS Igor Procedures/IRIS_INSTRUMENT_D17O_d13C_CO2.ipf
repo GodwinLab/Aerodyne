@@ -748,7 +748,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2()
 		target_cell_pressure = pressureTemp
 		IRIS_UTILITY_SetParamValueByName( "Target Cell Pressure", num2str(target_cell_pressure) )
 		IRIS_UTILITY_PropagateParamsToTables()
-		IRIS_UTILITY_AppendStringToNoteBook("IRISpanel#StatusNotebook", "*** WARNING: Target pressure reduced to sensor limit! ***")
+		IRIS_UTILITY_AppendStringToNoteBook("StatusNotebook", "*** WARNING: Target pressure reduced to sensor limit! ***")
 	endif
 	string IntVolTargetPressureForFlush = IRIS_UTILITY_GetParamValueFromName("Target Pressure for Flush of Int Vol") // torr
 	pressureTemp = str2num(IntVolTargetPressureForFlush)
@@ -757,7 +757,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2()
 		IntVolTargetPressureForFlush = num2str(pressureTemp)
 		IRIS_UTILITY_SetParamValueByName( "Target Pressure for Flush of Int Vol", IntVolTargetPressureForFlush )
 		IRIS_UTILITY_PropagateParamsToTables()
-		IRIS_UTILITY_AppendStringToNoteBook("IRISpanel#StatusNotebook", "*** WARNING: Target pressure reduced to sensor limit! ***")
+		IRIS_UTILITY_AppendStringToNoteBook("StatusNotebook", "*** WARNING: Target pressure reduced to sensor limit! ***")
 	endif
 	string cellTargetPressureForFlush = IRIS_UTILITY_GetParamValueFromName("Target Pressure for Flush of Cell") // torr
 	pressureTemp = str2num(cellTargetPressureForFlush)
@@ -766,7 +766,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2()
 		cellTargetPressureForFlush = num2str(pressureTemp)
 		IRIS_UTILITY_SetParamValueByName( "Target Pressure for Flush of Cell", cellTargetPressureForFlush )
 		IRIS_UTILITY_PropagateParamsToTables()
-		IRIS_UTILITY_AppendStringToNoteBook("IRISpanel#StatusNotebook", "*** WARNING: Target pressure reduced to sensor limit! ***")
+		IRIS_UTILITY_AppendStringToNoteBook("StatusNotebook", "*** WARNING: Target pressure reduced to sensor limit! ***")
 	endif
 	string IntVolTargetPressureForFinalFill = num2istr(target_cell_pressure*system_to_intVol_volume_ratio) // torr
 	
@@ -1105,7 +1105,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2_CapeTown()
 		target_cell_pressure = pressureTemp
 		IRIS_UTILITY_SetParamValueByName( "Target Cell Pressure", num2str(target_cell_pressure) )
 		IRIS_UTILITY_PropagateParamsToTables()
-		IRIS_UTILITY_AppendStringToNoteBook("IRISpanel#StatusNotebook", "*** WARNING: Target pressure reduced to sensor limit! ***")
+		IRIS_UTILITY_AppendStringToNoteBook("StatusNotebook", "*** WARNING: Target pressure reduced to sensor limit! ***")
 	endif
 	string IntVolTargetPressureForFlush = IRIS_UTILITY_GetParamValueFromName("Target Pressure for Flush of Int Vol") // torr
 	pressureTemp = str2num(IntVolTargetPressureForFlush)
@@ -1114,7 +1114,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2_CapeTown()
 		IntVolTargetPressureForFlush = num2str(pressureTemp)
 		IRIS_UTILITY_SetParamValueByName( "Target Pressure for Flush of Int Vol", IntVolTargetPressureForFlush )
 		IRIS_UTILITY_PropagateParamsToTables()
-		IRIS_UTILITY_AppendStringToNoteBook("IRISpanel#StatusNotebook", "*** WARNING: Target pressure reduced to sensor limit! ***")
+		IRIS_UTILITY_AppendStringToNoteBook("StatusNotebook", "*** WARNING: Target pressure reduced to sensor limit! ***")
 	endif
 	string cellTargetPressureForFlush = IRIS_UTILITY_GetParamValueFromName("Target Pressure for Flush of Cell") // torr
 	pressureTemp = str2num(cellTargetPressureForFlush)
@@ -1123,7 +1123,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2_CapeTown()
 		cellTargetPressureForFlush = num2str(pressureTemp)
 		IRIS_UTILITY_SetParamValueByName( "Target Pressure for Flush of Cell", cellTargetPressureForFlush )
 		IRIS_UTILITY_PropagateParamsToTables()
-		IRIS_UTILITY_AppendStringToNoteBook("IRISpanel#StatusNotebook", "*** WARNING: Target pressure reduced to sensor limit! ***")
+		IRIS_UTILITY_AppendStringToNoteBook("StatusNotebook", "*** WARNING: Target pressure reduced to sensor limit! ***")
 	endif
 	string IntVolTargetPressureForFinalFill = num2istr(target_cell_pressure*system_to_intVol_volume_ratio) // torr
 	
@@ -1451,7 +1451,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2_FastMixer()
 	if(manualSampleInjectionByVial == 1)
 		manualSampleInjectionBySeptum = 0
 	endif
-	variable timeToEvacuateCO2port = str2num(IRIS_UTILITY_GetParamValueFromName("Time to evacuate CO2 port"))
+	variable timeToEvacuateCO2port = str2num(IRIS_UTILITY_GetParamValueFromName("Time to Evacuate CO2 Port"))
 	
 	variable manifold_vacTimeForFill = str2num(IRIS_UTILITY_GetParamValueFromName("Sample Manifold: Vacuum Time before Fill"))
 	
@@ -1513,7 +1513,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2_FastMixer()
 	if(target_cell_pressure > 0.9*pressureSensorLimitForCell) // includes a safety margin of 10% of the sensor range
 		target_cell_pressure = 0.9*pressureSensorLimitForCell
 		pChanged = 1
-		IRIS_UTILITY_AppendStringToNoteBook("IRISpanel#StatusNotebook", "*** WARNING: Target pressure reduced to cell sensor limit! ***")
+		IRIS_UTILITY_AppendStringToNoteBook("StatusNotebook", "*** WARNING: Target pressure reduced to cell sensor limit! ***")
 	endif
 	variable IntVolTargetPressure_sample = (target_cell_pressure + pressureOffset_sample)*system_to_intVol_volume_ratio // torr
 	variable IntVolTargetPressure_ref = (target_cell_pressure + pressureOffset_ref)*system_to_intVol_volume_ratio // torr
@@ -1522,7 +1522,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2_FastMixer()
 		IntVolTargetPressure_ref = 0.9*pressureSensorLimitForIntVol
 		target_cell_pressure = IntVolTargetPressure_sample/system_to_intVol_volume_ratio
 		pChanged = 1
-		IRIS_UTILITY_AppendStringToNoteBook("IRISpanel#StatusNotebook", "*** WARNING: Target pressure reduced to keep int vol pressure below sensor limit! ***")
+		IRIS_UTILITY_AppendStringToNoteBook("StatusNotebook", "*** WARNING: Target pressure reduced to keep int vol pressure below sensor limit! ***")
 	endif
 	if(pChanged == 1)
 		IRIS_UTILITY_SetParamValueByName( "Target Cell Pressure", num2str(target_cell_pressure) )
@@ -1826,6 +1826,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2_FastMixer()
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, 0, "SendECL", "dno17", "open valve P17 (mixer vac)")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, valveActionTimeSpacer, "SendECL", "dno18", "open valve P18 (to evacuate CO2 port)")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, timeToEvacuateCO2port, "SendECL", "dnc18", "close valve P18")
+		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, valveActionTimeSpacer, "SendECL", "dnc17", "close valve P17 (mixer vac)")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, valveActionTimeSpacer, "WaitForUser", "MIXER: open sample " + num2str(i+1) + " (" + thisSampleID + ")", "")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, 0, "ReportStatus", "MIXER: idle", "")
 	endfor
@@ -1840,6 +1841,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2_FastMixer()
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, 0, "SendECL", "dno17", "open valve P17 (mixer vac)")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, valveActionTimeSpacer, "SendECL", "dno18", "open valve P18 (to evacuate CO2 port)")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, timeToEvacuateCO2port, "SendECL", "dnc18", "close valve P18")
+		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, valveActionTimeSpacer, "SendECL", "dnc17", "close valve P17 (mixer vac)")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, 0, "WaitForUser", "MIXER: inject sample " + num2str(i+1) + " (" + thisSampleID + ")", "")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, 0, "ReportStatus", "MIXER: idle", "")
 	endfor
@@ -2381,7 +2383,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2_LBL()
 	if(manualSampleInjectionByVial == 1)
 		manualSampleInjectionBySeptum = 0
 	endif
-	variable timeToEvacuateCO2port = str2num(IRIS_UTILITY_GetParamValueFromName("Time to evacuate CO2 port"))
+	variable timeToEvacuateCO2port = str2num(IRIS_UTILITY_GetParamValueFromName("Time to Evacuate CO2 Port"))
 	
 	variable manifold_vacTimeForFill = str2num(IRIS_UTILITY_GetParamValueFromName("Sample Manifold: Vacuum Time before Fill"))
 	
@@ -2443,7 +2445,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2_LBL()
 	if(target_cell_pressure > 0.9*pressureSensorLimitForCell) // includes a safety margin of 10% of the sensor range
 		target_cell_pressure = 0.9*pressureSensorLimitForCell
 		pChanged = 1
-		IRIS_UTILITY_AppendStringToNoteBook("IRISpanel#StatusNotebook", "*** WARNING: Target pressure reduced to cell sensor limit! ***")
+		IRIS_UTILITY_AppendStringToNoteBook("StatusNotebook", "*** WARNING: Target pressure reduced to cell sensor limit! ***")
 	endif
 	variable IntVolTargetPressure_sample = (target_cell_pressure + pressureOffset_sample)*system_to_intVol_volume_ratio // torr
 	variable IntVolTargetPressure_ref = (target_cell_pressure + pressureOffset_ref)*system_to_intVol_volume_ratio // torr
@@ -2452,7 +2454,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2_LBL()
 		IntVolTargetPressure_ref = 0.9*pressureSensorLimitForIntVol
 		target_cell_pressure = IntVolTargetPressure_sample/system_to_intVol_volume_ratio
 		pChanged = 1
-		IRIS_UTILITY_AppendStringToNoteBook("IRISpanel#StatusNotebook", "*** WARNING: Target pressure reduced to keep int vol pressure below sensor limit! ***")
+		IRIS_UTILITY_AppendStringToNoteBook("StatusNotebook", "*** WARNING: Target pressure reduced to keep int vol pressure below sensor limit! ***")
 	endif
 	if(pChanged == 1)
 		IRIS_UTILITY_SetParamValueByName( "Target Cell Pressure", num2str(target_cell_pressure) )
@@ -2756,6 +2758,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2_LBL()
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, 0, "SendECL", "dno17", "open valve P17 (mixer vac)")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, valveActionTimeSpacer, "SendECL", "dno18", "open valve P18 (to evacuate CO2 port)")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, timeToEvacuateCO2port, "SendECL", "dnc18", "close valve P18")
+		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, valveActionTimeSpacer, "SendECL", "dnc17", "close valve P17 (mixer vac)")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, valveActionTimeSpacer, "WaitForUser", "MIXER: open sample " + num2str(i+1) + " (" + thisSampleID + ")", "")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, 0, "ReportStatus", "MIXER: idle", "")
 	endfor
@@ -2770,6 +2773,7 @@ Function IRIS_SCHEME_BuildSchedule_D17O_d13C_CO2_LBL()
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, 0, "SendECL", "dno17", "open valve P17 (mixer vac)")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, valveActionTimeSpacer, "SendECL", "dno18", "open valve P18 (to evacuate CO2 port)")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, timeToEvacuateCO2port, "SendECL", "dnc18", "close valve P18")
+		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, valveActionTimeSpacer, "SendECL", "dnc17", "close valve P17 (mixer vac)")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, 0, "WaitForUser", "MIXER: inject sample " + num2str(i+1) + " (" + thisSampleID + ")", "")
 		IRIS_UTILITY_AppendEventToSchedule(thisScheduleName, 0, 0, "ReportStatus", "MIXER: idle", "")
 	endfor
@@ -3271,9 +3275,11 @@ Function IRIS_SCHEME_Analyze_D17O_d13C_CO2()
 	// === COLLATE THE TRUE REF GAS INFO ===
 	// NOTE: Whatever wave names you choose here will need to be used consistently afterward in this function.
 	
-	variable infoFlag = 0
+	variable infoFlag
 	make/O/N=(numRefGases) wRefTrueValues_CO2, wRefTrueValues_d13C, wRefTrueValues_d18O, wRefTrueValues_d17O
 	for(refNum=0;refNum<numRefGases;refNum+=1)
+		
+		infoFlag = 0
 		
 		sIRIStemp = "Reference " + num2str(refNum+1) + ": " + "CO2 Mole Fraction"
 		wRefTrueValues_CO2[refNum] = str2num(IRIS_UTILITY_GetParamValueFromName(sIRIStemp)) // ppm
@@ -3291,11 +3297,17 @@ Function IRIS_SCHEME_Analyze_D17O_d13C_CO2()
 		wRefTrueValues_d17O[refNum] = str2num(IRIS_UTILITY_GetParamValueFromName(sIRIStemp)) // permil VSMOW
 		infoFlag = (numtype(wRefTrueValues_d17O[refNum]) != 0) ? 1 : infoFlag
 		
+		if(infoFlag > 0)
+			IRIS_EVENT_ReportStatus("TILDAS: WARNING: The info for working ref " + num2str(refNum+1) + " is invalid!")
+			SetDataFolder $saveFolder
+			return 1
+		endif
+		
 	endfor
 	
-	if(infoFlag > 0)
-		IRIS_UTILITY_AppendStringToNoteBook("IRISpanel#StatusNotebook", secs2time(DateTime,3) + "  " + "*** WARNING: The info for working gas " + num2str(refNum+1) + " is invalid! ***")
-	endif
+//	if(infoFlag > 0)
+//		IRIS_UTILITY_AppendStringToNoteBook("StatusNotebook", secs2time(DateTime,3) + "  " + "*** WARNING: The info for working gas " + num2str(refNum+1) + " is invalid! ***")
+//	endif
 	
 	// === CONVERT TRUE REF GAS DELTAS AND TOTAL CO2 TO ISOTOPOLOGUE MOLE FRACTIONS ===
 	// NOTE: You must name the ref gas true isotopologue waves in the format: wRefTrueValues_iXXX, where XXX is 626 or 628 or 627_A, etc. (iXXX must be an entry in wOutputVariableSourceDataNames[wIndicesOfVariablesToCalibrate[j]] for some j).
