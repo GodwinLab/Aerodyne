@@ -174,6 +174,18 @@ Function IRIS()
 	string/G sResultsPath
 	string/G sDataPathOnDisk
 	string/G sDataPathOnDisk_Original
+
+	String platform = UpperStr(IgorInfo(2))
+	Variable platform_pos = strsearch(platform,"WINDOWS",0)
+	string homeDir
+	string relativePath
+	if (platform_pos >= 0)
+		homeDir = GetEnvironmentVariable("USERPROFILE")
+		relativePath = "C:IRIS"
+	else
+		homeDir = GetEnvironmentVariable("USER") // GetEnvironmentVariable("HOME")
+	endif
+
 	if(developmentMode == 1)
 		// Path for .iris configuration file
 		sIRISpath = 	"Macintosh HD:Users:Rick:Professional:Aerodyne:Software Development:IRIS"
@@ -182,12 +194,19 @@ Function IRIS()
 		// Path for .str and .stc data files
 		sDataPathOnDisk = "Macintosh HD:Users:Rick:Professional:Aerodyne:Software Development:IRIS"
 	else
-		// Path for .iris configuration file
-		sIRISpath = "C:IRIS"
-		// Path for saving results files
-		sResultsPath = sIRISpath
-		// Path for .str and .stc data files
-		sDataPathOnDisk = "C:TDLWintel:Data"
+		if (platform_pos >= 0)
+			// Path for .iris configuration file
+			sIRISpath = "C:IRIS"
+			// Path for saving results files
+			sResultsPath = sIRISpath
+			// Path for .str and .stc data files
+			sDataPathOnDisk = "C:TDLWintel:Data"
+		else
+			relativePath = "Library:CloudStorage:OneDrive-UniversityofCambridge:godwinlab_data:Aerodyne:Data"
+			sIRISpath = "Mac:Users" + ":" + homeDir + ":" + relativePath + ":" + "IRIS"
+			sResultsPath = sIRISpath
+			sDataPathOnDisk = "Mac:Users" + ":" + homeDir + ":" + relativePath
+		endif
 	endif
 	sDataPathOnDisk_Original = sDataPathOnDisk // only needed in case the user chooses files outside this directory in the reanalysis tab 
 	NewPath/C/Q/O pIRISpath, sIRISpath // the "/C" flag creates the folder on disk if it does not already exist
@@ -7623,7 +7642,7 @@ Function IRIS_GUI_Panel()
 	
 	// Add the Aerodyne logo...
 	NewPanel/HOST=IRISpanel/N=LogoSubwindowPanel_tabRunOrReanalyze/W=(0,panelHeight - logoHeight,panelWidth,panelHeight)
-	ModifyPanel/W=IRISpanel#LogoSubwindowPanel_tabRunOrReanalyze frameStyle = 0, frameInset = 0, noEdit = 1, fixedSize = 1
+	ModifyPanel frameStyle = 0, frameInset = 0, noEdit = 1, fixedSize = 1
 	Button IRIS_AerodyneLogo_tabRunOrReanalyze, win = IRISpanel#LogoSubwindowPanel_tabRunOrReanalyze, align = 0, pos = {panelWidth/2 - logoWidth/2, 0}, size = {logoWidth,logoHeight}, noproc, title = " ", picture = ProcGlobal#AerodyneLogoButtonPic
 	SetActiveSubwindow ##
 	

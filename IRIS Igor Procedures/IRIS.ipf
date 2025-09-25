@@ -128,7 +128,7 @@ Function IRIS()
 	variable/G isTabCal = 0
 	variable/G showSecondPlotOnGraph = 0
 	variable/G showSecondPlotOnGraph_old = 0
-	variable/G useSeparateGraphAxis = 0
+	variable/G useSeparateGraphAxis = 1
 	variable/G useSeparateGraphAxis_old = 0
 	variable/G gasToGraph1 = 0
 	variable/G variableToGraph1 = 0
@@ -10183,12 +10183,12 @@ Function IRIS_SCHEME_DefineVariables_D17O_d13C_CO2()
 	output2_gasID = 0 // 0 is the first sample gas
 	output3_gasID = 0 // 0 is the first sample gas
 	gasToGraph1 = 0 // 0 is the first sample gas
-	gasToGraph2 = 0 // 0 is the first sample gas
-	output1_variableID = IRIS_UTILITY_GetOutputIndexFromName( "Δ'17O" )
-	output2_variableID = IRIS_UTILITY_GetOutputIndexFromName( "δ13C (VPDB)" )
-	output3_variableID = IRIS_UTILITY_GetOutputIndexFromName( "CO2 Mole Fraction" )
-	variableToGraph1 = IRIS_UTILITY_GetOutputIndexFromName( "Δ'17O" )
-	variableToGraph2 = IRIS_UTILITY_GetOutputIndexFromName( "δ13C (VPDB)" )
+	gasToGraph2 = 1 // 0 is the first sample gas
+	output1_variableID = IRIS_UTILITY_GetOutputIndexFromName( "δ13C (VPDB)" )
+	output2_variableID = IRIS_UTILITY_GetOutputIndexFromName( "δ18O (VSMOW)" )
+	output3_variableID = IRIS_UTILITY_GetOutputIndexFromName( "Δ'17O" )
+	variableToGraph1 = IRIS_UTILITY_GetOutputIndexFromName( "Unreferenced 626 Mole Fraction" )
+	variableToGraph2 = IRIS_UTILITY_GetOutputIndexFromName( "Unreferenced 626 Mole Fraction" )
 	
 End
 
