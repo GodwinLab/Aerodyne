@@ -10067,7 +10067,7 @@ Function IRIS_SCHEME_DefineVariables_D17O_d13C_CO2()
 	sourceDataName = "CO2_Avg" // the name of the source wave that will be averaged and/or calibrated and/or shown to the user
 	sourceDataType = "avg" // set sourceDataType = "str" for data on the str_source_rtime time grid; set sourceDataType = "stc" for data on the "stc_time" time grid; set sourceDataType = "avg" for data on the cell-fill-period time grid
 	units = "ppm" // sets the units that will accompany the variable when saved to disk or displayed onscreen
-	format = "%.2f" // sets the number format for onscreen display
+	format = "%.4f" // sets the number format for onscreen display
 	calibrateOrNot = 0 // set calibrateOrNot = 1 if the value for each gas fill period needs to be calibrated against reference gas(es); set calibrateOrNot = 0 otherwise
 	rescaleFactor = 1 // e.g. set rescaleFactor = 1/1000 to convert ppb to ppm; set rescaleFactor = 1 for no rescaling
 	diagnosticSlot = 0 // set diagnosticSlot = 1, 2, 3 to assign str or stc data to one of the three plots in the diagnostic graph; set diagnosticSlot = 0 otherwise
@@ -10097,7 +10097,7 @@ Function IRIS_SCHEME_DefineVariables_D17O_d13C_CO2()
 	sourceDataName = "i626" // the name of the source wave that will be averaged and/or calibrated and/or shown to the user
 	sourceDataType = "str" // set sourceDataType = "str" for data on the str_source_rtime time grid; set sourceDataType = "stc" for data on the "stc_time" time grid; set sourceDataType = "avg" for data on the cell-fill-period time grid
 	units = "ppm" // sets the units that will accompany the variable when saved to disk or displayed onscreen
-	format = "%.2f" // sets the number format for onscreen display
+	format = "%.4f" // sets the number format for onscreen display
 	calibrateOrNot = 1 // set calibrateOrNot = 1 if the value for each gas fill period needs to be calibrated against reference gas(es); set calibrateOrNot = 0 otherwise
 	rescaleFactor = 1/1000 // e.g. set rescaleFactor = 1/1000 to convert ppb to ppm; set rescaleFactor = 1 for no rescaling
 	diagnosticSlot = 1 // set diagnosticSlot = 1, 2, 3 to assign str or stc data to one of the three plots in the diagnostic graph; set diagnosticSlot = 0 otherwise
@@ -10127,7 +10127,7 @@ Function IRIS_SCHEME_DefineVariables_D17O_d13C_CO2()
 	sourceDataName = "i628" // the name of the source wave that will be averaged and/or calibrated and/or shown to the user
 	sourceDataType = "str" // set sourceDataType = "str" for data on the str_source_rtime time grid; set sourceDataType = "stc" for data on the "stc_time" time grid; set sourceDataType = "avg" for data on the cell-fill-period time grid
 	units = "ppm" // sets the units that will accompany the variable when saved to disk or displayed onscreen
-	format = "%.2f" // sets the number format for onscreen display
+	format = "%.4f" // sets the number format for onscreen display
 	calibrateOrNot = 1 // set calibrateOrNot = 1 if the value for each gas fill period needs to be calibrated against reference gas(es); set calibrateOrNot = 0 otherwise
 	rescaleFactor = 1/1000 // e.g. set rescaleFactor = 1/1000 to convert ppb to ppm; set rescaleFactor = 1 for no rescaling
 	diagnosticSlot = 0 // set diagnosticSlot = 1, 2, 3 to assign str or stc data to one of the three plots in the diagnostic graph; set diagnosticSlot = 0 otherwise

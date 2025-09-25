@@ -1,11 +1,20 @@
 // THIS SCRIPT FILLS THE INTERMEDIATE VOLUME WITH REF
 
+dno9			// open valve P9 (working ref cross vac)
+bc5				// pump 5 seconds on ref gas
+dno11			// open valve P11 (ref gas port)
+bc5				// pump 5 seconds on ref gas
+dnc9			// close valve P9 (working ref cross vac)
+
 dno14			// open valve P14 (switcher vac)
 dno12			// open valve P12 (intermediate volume)
 bc20			// pump 20 seconds on intermediate volume
 dnc12			// close valve P12 (intermediate volume)
 dnc14			// close valve P14 (switcher vac)
-azb1,2,150		// fill via valve E2 (ref orifice) until gauge 2 (intermediate volume) reaches 150 torr
+azb1,2,195		// fill via valve E2 (ref orifice) until gauge 2 (intermediate volume) reaches 150 torr
 bc60       		// special use of bc: 60 sec timeout for the azb command on the previous line
+
+dnc11			// close valve P11 (ref gas port)
+
 dmWaiting_for_sample_measurement_to_complete // status message in popup window
 cr				// wait for the timer that was started before this script began

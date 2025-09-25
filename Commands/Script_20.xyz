@@ -26,6 +26,18 @@ dmEvacuating_unfilled_flask // status message in popup window
 ca0				// disable user ECL index (set stc_ECL_index = 0)
 bdFits1			// suspend fitting
 
+dnc11
+dno9			// open valve P9 (working ref cross vac)
+bc5				// pump 5 seconds on ref gas
+dno10
+bc30			// pump 30 seconds on ref gas
+dnc10
+bc1
+dno11			// open valve P11 (ref gas port)
+bc5				// pump 5 seconds on ref gas
+dnc9			// close valve P9 (working ref cross vac)
+dno10
+
 dnc18			// close valve P18 (CO2 supply)
 bc1				// THIS BLOCK EVACUATES THE TARGET FLASK (AND ITS INPUT AND OUTPUT TUBES)
 dno17			// open valve P17 (mixer vac)
@@ -33,47 +45,28 @@ bc5				// wait 5 sec
 dn1,-34			// open valve E3 or E4 (flask input)
 bc60			// wait 60 sec
 dn0,-34			// close valve E3 or E4 (flask input)
-dnc17			// close valve P17 (mixer vac)
 
-				// THIS BLOCK RECORDS THE ZERO OFFSET FOR BOTH MIXER P SENSORS
-cz1,11,12		// capture into R11, the P(zero) of AD12 (the low-P sensor in mixer)
-cz1,12,13		// capture into R12, the P(zero) oF AD13 (the high-P sensor in mixer)
+cz0,17,1130 	// store '1130' into R17, which is the target high-P sensor reading
 
-dmAdding_CO2_to_the_unfilled_flask // status message in popup window
+dmAdding_ref_gas_to_the_unfilled_flask // status message in popup window
 
-				// THIS BLOCK ADDS CO2 TO THE TARGET FLASK, FROM A SMALL VOLUME (e.g. A VIAL) UPSTREAM OF P18
-bc2
-dno18			// let CO2 sample flow into manifold
-bc30			// for 15 sec (exact time not important as CO2 will rapidly equilibrate across the valve)
-dnc18			// and then close valve P18
-bc4         	// let it settle for readings
-cz1,13,12   	// capture into R13, the P(CO2) of AD12 (the low-P sensor in mixer)
-cysub,14,13,11	// store P(CO2) - P(zero) in register 14 (R14) to account for offset in gauge
-cz0,15,164		// *** store '125' into R15     %%% the 125 factor controls the final [CO2] in the lower flask (it is the inverse of the product of the volume ratio and the target mixing ratio)
-cymul,16,14,15	// store R14 * R15 into R16
-cyadd,17,16,12	// store R16 (target pressure) + R12 (high-P sensor zero offset) into R17 to get target high-P sensor reading
-dn1,-34			// open valve E3 or E4 (flask input) to let CO2 expand into flask
-bc30        	// molecular diffusion 10*1/e time ...
-dn0,-34			// close valve E3 or E4 (flask input) to isolate flask from manifold
-
-dmAdding_dilution_gas_to_the_unfilled_flask // status message in popup window
-
-				// THIS BLOCK ADDS DILUTION GAS TO THE TARGET FLASK, TO REACH THE TARGET CO2 MIXING RATIO
-dno17       	// open P17 (mixer vac) to manifold
-bc5         	// dispose of unrecoverable CO2
+				// THIS BLOCK ADDS REF GAS TO THE TARGET FLASK, TO REACH THE TARGET P
 dnc17       	// close valve P17 (mixer vac)
-dno5        	// open E5 (dilution gas)
+dno5        	// open E5 (ref gas)
 bc4				// load up a little pressure in the prep volume
-dnc5        	// close valve E5 (dilution gas)
-dn1,-34			// open valve E3 or E4 (flask input) to let dilution gas slam & mix into flask
+dnc5        	// close valve E5 (ref gas)
+dn1,-34			// open valve E3 or E4 (flask input) to let ref gas slam & mix into flask
 bc2				// for 2 sec
 azb3,5,-17		// control E5 to fill to the R17 target P(tot) reading
 bc180       	// special use of bc: 180 sec timeout for the azb command on the previous line
 
+dnc10			// close valve P10
+dnc11			// close valve P11 (ref gas port)
+
 				// THIS BLOCK CLOSES ALL THE MIXER MANIFOLD VALVES
 dnc3			// close valve E3 (upper flask input)
 dnc4			// close valve E4 (lower flask input)
-dnc5			// close valve E5 (dilution gas supply)
+dnc5			// close valve E5 (ref gas supply)
 dnc18			// close valve P18 (CO2 supply)
 dnc17			// close valve P17 (mixer vac)
 
@@ -94,7 +87,7 @@ amwd1			// turn on wd
 // @?
 				// THIS BLOCK STARTS A 1-SECOND DUMMY TIMER, JUST TO ALLOW FOR SIMPLE COPY-AND-PASTING OF SCRIPT 4 BELOW
 cr1				// start a 1-second timer
-				
+
 				// THIS BLOCK DOES THE SWITCHER CYCLES (EACH dd4 COMMAND WILL DO ONE REF-SAMPLE CYCLE)
 dd4				// runs script 4, which does one switcher cycle (fill int vol with ref, transfer that to cell and measure, fill int vol with sample, transfer that to cell and measure)
 dd4				// runs script 4, which does one switcher cycle (fill int vol with ref, transfer that to cell and measure, fill int vol with sample, transfer that to cell and measure)
@@ -102,11 +95,6 @@ dd4				// runs script 4, which does one switcher cycle (fill int vol with ref, t
 dd4				// runs script 4, which does one switcher cycle (fill int vol with ref, transfer that to cell and measure, fill int vol with sample, transfer that to cell and measure)
 dd4				// runs script 4, which does one switcher cycle (fill int vol with ref, transfer that to cell and measure, fill int vol with sample, transfer that to cell and measure)
 dd4				// runs script 4, which does one switcher cycle (fill int vol with ref, transfer that to cell and measure, fill int vol with sample, transfer that to cell and measure)
-dd4				// runs script 4, which does one switcher cycle (fill int vol with ref, transfer that to cell and measure, fill int vol with sample, transfer that to cell and measure)
-dd4				// runs script 4, which does one switcher cycle (fill int vol with ref, transfer that to cell and measure, fill int vol with sample, transfer that to cell and measure)
-dd4				// runs script 4, which does one switcher cycle (fill int vol with ref, transfer that to cell and measure, fill int vol with sample, transfer that to cell and measure)
-dd4				// runs script 4, which does one switcher cycle (fill int vol with ref, transfer that to cell and measure, fill int vol with sample, transfer that to cell and measure)
-
 dd4				// runs script 4, which does one switcher cycle (fill int vol with ref, transfer that to cell and measure, fill int vol with sample, transfer that to cell and measure)
 dd4				// runs script 4, which does one switcher cycle (fill int vol with ref, transfer that to cell and measure, fill int vol with sample, transfer that to cell and measure)
 dd4				// runs script 4, which does one switcher cycle (fill int vol with ref, transfer that to cell and measure, fill int vol with sample, transfer that to cell and measure)
@@ -141,12 +129,12 @@ ca0				// suspend ecl index
 bdFits1			// suspend fitting
 dnc12			// shut intermediate volume
 dno14			// open vac valve
-dno15			// open cell valve	
+dno15			// open cell valve
 bc25			// wait 25 seconds to pump
 dnc14			// shut vac valve
 bc1				// wait 1 seconds
 dno12			// open intermediate volume, expand gas into cell
-bc20				// wait 4 seconds to expand gas into cell
+bc4				// wait 4 seconds to expand gas into cell
 dnc15			// shut cell, measurement runs
 dnc12			// close intermediate volume
 bz2				// defines ecl index = 2 (ref)
@@ -169,7 +157,7 @@ amwd1			// turn on wd
 dmFlushing_the_full_flask_output_tube // status message in popup window
 
 				// THIS BLOCK FORWARD-FLUSHES THE JOINT SAMPLE LINE WITH GAS FROM THE FLASK THAT WE FILLED AT THE BEGINNING OF THIS SCRIPT AND LEAVES THAT FLASK EXPOSED TO IT
-dno14			// pre apply vacuum 
+dno14			// pre apply vacuum
 dno12			// all the way through
 dno1			// to measurement orifice
 bc2				// wait 2 sec with flow
@@ -195,10 +183,9 @@ cysub,34,4,10	// the register math to update R34 with the target flask input val
 
 // cracker
 dnc16			// close cracker
-
 // ref gas
-// dno17
-// dno18
+dno17
+dno18
 
 dmPlease_prepare_your_CO2_sample_upstream_of_valve_P18_now_and_then_launch_the_next_script // put up message window to prompt the user
 

@@ -26,9 +26,20 @@ dnc17			// close P17
 dnc18			// close P18
 dnc19			// set 3-way valve to lower flask
 
+// dd9				// INTRODUCES SAMPLE GAS FROM THE CRACKER
+
 dmEvacuating_switcher_and_mixer // status message in popup window
 
 				// THIS BLOCK EVACUATES THE WHOLE SAMPLING SYSTEM FROM BOTH ENDS (BUT NOT THE CELL)
+dnc17			// close valve P17 (mixer vac)
+dnc14			// close valve P14 (switcher vac)
+dno9			// open valve P9 (working ref cross vac)
+bc5				// wait 5 sec
+dno11			// open valve P11 (ref gas port)
+bc20			// wait 20 sec
+dnc11			// close valve P11 (ref gas port)
+bc10			// wait 10 sec
+
 dnc15			// close valve P15 (cell), redundancy just in case
 dno17			// open valve P17 (mixer vac)
 bc5				// wait 5 sec
@@ -36,8 +47,7 @@ dno14			// open valve P14 (switcher vac)
 bc5				// wait 5 sec
 dno12			// open valve P12 (intermediate volume)
 bc5				// wait 5 sec
-dno9			// open valve P9 (working ref cross vac)
-bc5				// wait 5 sec
+
 dno3			// open valve E3 (upper flask input)
 bc5				// wait 5 sec
 dno4			// open valve E4 (lower flask input)
@@ -65,7 +75,7 @@ dnc18			// close P18
 dnc19			// set 3-way valve to lower flask
 
 				// THIS BLOCK OPENS THE REF GAS SUPPLY PORT
-dno11			// open valve P11 (ref gas port)
+// dno11			// open valve P11 (ref gas port)
 				
 				// THIS BLOCK RECORDS THE ZERO OFFSET FOR BOTH MIXER P SENSORS
 cz1,11,12		// capture into R11, the P(zero) of AD12 (the low-P sensor in mixer)
@@ -74,17 +84,18 @@ cz1,12,13		// capture into R12, the P(zero) oF AD13 (the high-P sensor in mixer)
 dmAdding_CO2_to_the_first_flask // status message in popup window
 
 				// THIS BLOCK ADDS CO2 TO THE UPPER FLASK, FROM A SMALL VOLUME (e.g. A VIAL) UPSTREAM OF P18
+bc2
 dno18			// let CO2 sample flow into manifold
-bc4				// for 4 sec (exact time not important as CO2 will rapidly equilibrate across the valve)
+bc30			// for 15 sec (exact time not important as CO2 will rapidly equilibrate across the valve)
 dnc18			// and then close valve P18
 bc4         	// let it settle for readings
 cz1,13,12   	// capture into R13, the P(CO2) of AD12 (the low-P sensor in mixer)
 cysub,14,13,11	// store P(CO2) - P(zero) in register 14 (R14) to account for offset in gauge
-cz0,15,125		// *** store '125' into R15     %%% the 125 factor controls the final [CO2] in the lower flask (it is the inverse of the product of the volume ratio and the target mixing ratio)
+cz0,15,164		// *** store '125' into R15     %%% the 125 factor controls the final [CO2] in the lower flask (it is the inverse of the product of the volume ratio and the target mixing ratio)
 cymul,16,14,15	// store R14 * R15 into R16
 cyadd,17,16,12	// store R16 (target pressure) + R12 (high-P sensor zero offset) into R17 to get target high-P sensor reading
 dno3        	// open valve E3 (upper flask input) to let CO2 expand into upper flask
-bc20        	// molecular diffusion 10*1/e time ...
+bc30        	// molecular diffusion 10*1/e time ...
 dnc3        	// close valve E3 (upper flask input) to isolate upper flask from manifold
 
 dmAdding_dilution_gas_to_the_first_flask // status message in popup window
@@ -110,8 +121,7 @@ dnc17			// close valve P17 (mixer vac)
 dmWaiting_32_minutes_for_mixing_in_the_first_flask // status message in popup window
 
 				// THIS BLOCK WAITS 32 MINUTES FOR MIXING OF THE FIRST FLASK FILL
-bc1920			// wait 1920 sec
-
+bc3000			// wait 1920 sec // 3000 for ~15 cycles in Script_2.xyz
 
 dmFlushing_the_flask_output_tube // status message in popup window
 
@@ -141,6 +151,13 @@ cz0,1,1			// store '1' into Register 1 (R1); a constant
 cz0,4,4			// store '4' into Register 4 (R4); a constant
 cz0,10,0		// store '0' into Register 10 (R10), which must contain either a 1 (ECL commands access upper flask) or 0 (ECL commands access lower flask)
 cysub,34,4,10	// update Register 34 (R34), which stores the valve number for flask input, either 3 or 4 (counting from 1), computed from R10
+
+// cracker
+dnc16			// close cracker
+
+// ref gas
+// dno17
+// dno18
 
 dmPlease_prepare_your_CO2_sample_upstream_of_valve_P18_now_and_then_launch_the_next_script // put up message window to prompt the user
 

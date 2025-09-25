@@ -9,7 +9,7 @@ bc25			// wait 25 seconds to pump
 dnc14			// shut vac valve
 bc1				// wait 1 seconds
 dno12			// open intermediate volume, expand gas into cell
-bc4				// wait 4 seconds to expand gas into cell
+bc20				// wait 4 seconds to expand gas into cell
 dnc15			// shut cell, measurement runs
 dnc12			// close intermediate volume
 bz1				// defines ecl index = 1 (sample)

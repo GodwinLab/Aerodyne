@@ -1,0 +1,13 @@
+// THIS SCRIPT INTRODUCES SAMPLE GAS FROM THE CRACKER
+
+
+dno17			// open vac valve
+dno18			// open valve P18 (CO2 supply)
+bc35			// wait 35 seconds to pump
+dnc17			// shut vac valve
+dnc18			// close valve P18 (CO2 supply)
+bc2				// wait 2 seconds
+dno16			// open cracker
+bc2				// wait 2 seconds
+
+dd2
